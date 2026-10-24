@@ -1,0 +1,49 @@
+version: '3.3'
+
+services:
+  web:
+    build: .
+    container_name: php_web
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www/html
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_PASS=secretpassword
+      - DB_USER=root
+      - DB_NAME=db_berita
+    depends_on:
+      - db
+    
+    #layanan database mysql
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secretpassword
+      MYSQL_DATABASE: db_berita
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    
+  
+  #layanan phpmyadmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db #untuk menghubungkan ke layanan database mysql
+      MYSQL_ROOT_PASSWORD: secretpassword
+    depends_on:
+      - db
+
+volumes:
+  db_data:
